@@ -17,6 +17,7 @@ export default function App() {
 
   const [newMessageText, setNewMessageText] = useState("");
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Effect should run when messages change to scroll to bottom
   useEffect(() => {
     // Make sure scrollTo works on button click in Chrome
     setTimeout(() => {
@@ -56,7 +57,6 @@ export default function App() {
             setNewMessageText(text);
           }}
           placeholder="Write a message…"
-          autoFocus
         />
         <button type="submit" disabled={!newMessageText}>
           Send
