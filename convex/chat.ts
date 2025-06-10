@@ -48,7 +48,7 @@ export const getWikipediaSummary = internalAction({
     });  },
 });
 
-function getSummaryFromJSON(data: any) {
+export function getSummaryFromJSON(data: any) {
   const firstPageId = Object.keys(data.query.pages)[0];
   return data.query.pages[firstPageId].extract;
 }

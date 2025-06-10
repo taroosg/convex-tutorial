@@ -66,7 +66,7 @@ export default function App() {
   );
 }
 
-function getOrSetFakeName() {
+export function getOrSetFakeName() {
   const NAME_KEY = "tutorial_name";
   const name = sessionStorage.getItem(NAME_KEY);
   if (!name) {
