@@ -1,11 +1,11 @@
-import '@testing-library/jest-dom'
-import { vi } from 'vitest'
+import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
 // Mock window.scrollTo globally
-Object.defineProperty(window, 'scrollTo', {
+Object.defineProperty(window, "scrollTo", {
   value: vi.fn(),
   writable: true,
-})
+});
 
 // Mock sessionStorage globally
 const mockSessionStorage = {
@@ -13,12 +13,12 @@ const mockSessionStorage = {
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
-}
+};
 
-Object.defineProperty(window, 'sessionStorage', {
+Object.defineProperty(window, "sessionStorage", {
   value: mockSessionStorage,
   writable: true,
-})
+});
 
 // Make mock available globally for tests
-global.mockSessionStorage = mockSessionStorage
+global.mockSessionStorage = mockSessionStorage;

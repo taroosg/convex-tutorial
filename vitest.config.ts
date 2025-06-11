@@ -15,8 +15,10 @@ export default defineConfig({
         'node_modules/',
         'src/test/',
         '**/*.test.{ts,tsx}',
-        '**/*.config.{ts,js}',
+        '**/*.config.{ts,js,mts}',
+        '**/*.d.{ts,js,mts}',
         'convex/_generated/',
+        'vite.config.mts',
       ]
     }
   },
