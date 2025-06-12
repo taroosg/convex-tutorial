@@ -45,7 +45,8 @@ export const getWikipediaSummary = internalAction({
     await ctx.scheduler.runAfter(0, api.chat.sendMessage, {
       user: "Wikipedia",
       body: summary,
-    });  },
+    });
+  },
 });
 
 export function getSummaryFromJSON(data: any) {
@@ -75,7 +76,7 @@ export function buildWikipediaUrl(topic: string): string {
     exintro: "true",
     explaintext: "true",
     redirects: "1",
-    titles: topic
+    titles: topic,
   });
   return `${baseUrl}?${params.toString()}`;
 }
