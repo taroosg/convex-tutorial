@@ -21,4 +21,4 @@ Object.defineProperty(window, "sessionStorage", {
 });
 
 // Make mock available globally for tests
-global.mockSessionStorage = mockSessionStorage;
+(global as typeof global & { mockSessionStorage: typeof mockSessionStorage }).mockSessionStorage = mockSessionStorage;
