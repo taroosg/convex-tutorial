@@ -45,10 +45,38 @@ export const getWikipediaSummary = internalAction({
     await ctx.scheduler.runAfter(0, api.chat.sendMessage, {
       user: "Wikipedia",
       body: summary,
-    });  },
+    });
+  },
 });
 
-function getSummaryFromJSON(data: any) {
+export function getSummaryFromJSON(data: any) {
   const firstPageId = Object.keys(data.query.pages)[0];
   return data.query.pages[firstPageId].extract;
+}
+
+// ヘルパー関数：wikiコマンドの検証とトピック抽出
+export function extractWikiTopic(message: string): string | null {
+  if (!message.startsWith("/wiki")) {
+    return null;
+  }
+  const spaceIndex = message.indexOf(" ");
+  if (spaceIndex === -1) {
+    return "";
+  }
+  return message.slice(spaceIndex + 1);
+}
+
+// ヘルパー関数：Wikipedia API URLの生成
+export function buildWikipediaUrl(topic: string): string {
+  const baseUrl = "https://en.wikipedia.org/w/api.php";
+  const params = new URLSearchParams({
+    format: "json",
+    action: "query",
+    prop: "extracts",
+    exintro: "true",
+    explaintext: "true",
+    redirects: "1",
+    titles: topic,
+  });
+  return `${baseUrl}?${params.toString()}`;
 }

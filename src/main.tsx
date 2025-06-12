@@ -6,7 +6,7 @@ import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <ConvexProvider client={convex}>
       <App />
