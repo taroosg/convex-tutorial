@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getSummaryFromJSON, extractWikiTopic, buildWikipediaUrl } from "./chat";
+import { convexTest } from "convex-test";
+import { api } from "./_generated/api";
+import {
+  getSummaryFromJSON,
+  extractWikiTopic,
+  buildWikipediaUrl,
+} from "./chat";
 
 describe("chat.ts", () => {
   describe("getSummaryFromJSON", () => {
@@ -9,10 +15,10 @@ describe("chat.ts", () => {
         query: {
           pages: {
             "12345": {
-              extract: "これはテスト用のWikipediaの要約です。"
-            }
-          }
-        }
+              extract: "これはテスト用のWikipediaの要約です。",
+            },
+          },
+        },
       };
 
       // 期待される結果: 正しい要約テキストが返される
@@ -26,13 +32,13 @@ describe("chat.ts", () => {
         query: {
           pages: {
             "11111": {
-              extract: "最初のページの要約"
+              extract: "最初のページの要約",
             },
             "22222": {
-              extract: "二番目のページの要約"
-            }
-          }
-        }
+              extract: "二番目のページの要約",
+            },
+          },
+        },
       };
 
       // 期待される結果: 最初のページの要約が返される（オブジェクトキーの順序による）
@@ -46,73 +52,15 @@ describe("chat.ts", () => {
         query: {
           pages: {
             "12345": {
-              title: "テストページ"
-            }
-          }
-        }
+              title: "テストページ",
+            },
+          },
+        },
       };
 
       // 期待される結果: undefinedが返される
       const result = getSummaryFromJSON(mockResponse);
       expect(result).toBeUndefined();
-    });
-  });
-
-  describe("sendMessage mutation handler logic", () => {
-    it("should handle wiki command correctly", () => {
-      // 条件: "/wiki"で始まるメッセージが送信された場合
-      const wikiMessage = "/wiki 日本";
-      const topic = wikiMessage.slice(wikiMessage.indexOf(" ") + 1);
-
-      // 期待される結果: トピックが正しく抽出される
-      expect(topic).toBe("日本");
-    });
-
-    it("should extract topic from wiki command with multiple words", () => {
-      // 条件: 複数の単語を含むwikiコマンドが送信された場合
-      const wikiMessage = "/wiki artificial intelligence";
-      const topic = wikiMessage.slice(wikiMessage.indexOf(" ") + 1);
-
-      // 期待される結果: スペース以降の全ての文字列が抽出される
-      expect(topic).toBe("artificial intelligence");
-    });
-
-    it("should handle wiki command without topic", () => {
-      // 条件: トピックなしの"/wiki"コマンドが送信された場合
-      const wikiMessage = "/wiki";
-      const spaceIndex = wikiMessage.indexOf(" ");
-      const topic = spaceIndex !== -1 ? wikiMessage.slice(spaceIndex + 1) : "";
-
-      // 期待される結果: 空文字列が返される
-      expect(topic).toBe("");
-    });
-
-    it("should detect wiki command start correctly", () => {
-      // 条件: 様々なメッセージが与えられた場合
-      const wikiCommand = "/wiki test";
-      const normalMessage = "hello world";
-      const wikiInMiddle = "check /wiki test";
-
-      // 期待される結果: /wikiで始まるメッセージのみが検出される
-      expect(wikiCommand.startsWith("/wiki")).toBe(true);
-      expect(normalMessage.startsWith("/wiki")).toBe(false);
-      expect(wikiInMiddle.startsWith("/wiki")).toBe(false);
-    });
-  });
-
-  describe("getMessages query handler logic", () => {
-    it("should handle message ordering logic", () => {
-      // 条件: メッセージの配列が与えられた場合
-      const mockMessages = [
-        { _id: "3", user: "Carol", body: "Latest message" },
-        { _id: "1", user: "Alice", body: "First message" },
-        { _id: "2", user: "Bob", body: "Middle message" }
-      ];
-
-      // 期待される結果: reverse()を呼んだ時に順序が逆転する
-      const reversed = [...mockMessages].reverse();
-      expect(reversed[0]._id).toBe("2");
-      expect(reversed[2]._id).toBe("3");
     });
   });
 
@@ -125,7 +73,9 @@ describe("chat.ts", () => {
     it("should construct Wikipedia API URL correctly", () => {
       // 条件: トピックが与えられた場合
       const topic = "人工知能";
-      const expectedUrl = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=" + topic;
+      const expectedUrl =
+        "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=" +
+        topic;
 
       // 期待される結果: 正しいAPIのURLが構築される
       expect(expectedUrl).toContain("https://en.wikipedia.org/w/api.php");
@@ -141,11 +91,11 @@ describe("chat.ts", () => {
           query: {
             pages: {
               "12345": {
-                extract: "テスト用のWikipedia要約"
-              }
-            }
-          }
-        })
+                extract: "テスト用のWikipedia要約",
+              },
+            },
+          },
+        }),
       };
 
       global.fetch = vi.fn().mockResolvedValue(mockResponse);
@@ -170,7 +120,7 @@ describe("chat.ts", () => {
     it("should export sendMessage function", async () => {
       // 条件: sendMessage関数がエクスポートされている場合
       const { sendMessage } = await import("./chat");
-      
+
       // 期待される結果: 関数が存在する
       expect(sendMessage).toBeDefined();
       expect(typeof sendMessage).toBe("function");
@@ -179,7 +129,7 @@ describe("chat.ts", () => {
     it("should export getMessages function", async () => {
       // 条件: getMessages関数がエクスポートされている場合
       const { getMessages } = await import("./chat");
-      
+
       // 期待される結果: 関数が存在する
       expect(getMessages).toBeDefined();
       expect(typeof getMessages).toBe("function");
@@ -188,7 +138,7 @@ describe("chat.ts", () => {
     it("should export getWikipediaSummary function", async () => {
       // 条件: getWikipediaSummary関数がエクスポートされている場合
       const { getWikipediaSummary } = await import("./chat");
-      
+
       // 期待される結果: 関数が存在する
       expect(getWikipediaSummary).toBeDefined();
       expect(typeof getWikipediaSummary).toBe("function");
@@ -197,7 +147,7 @@ describe("chat.ts", () => {
     it("should export getSummaryFromJSON function", async () => {
       // 条件: getSummaryFromJSON関数がエクスポートされている場合
       const { getSummaryFromJSON } = await import("./chat");
-      
+
       // 期待される結果: 関数が存在する
       expect(getSummaryFromJSON).toBeDefined();
       expect(typeof getSummaryFromJSON).toBe("function");
@@ -205,22 +155,6 @@ describe("chat.ts", () => {
   });
 
   describe("Edge cases and error handling", () => {
-    it("should handle malformed Wikipedia response", () => {
-      // 条件: 不正な形式のWikipediaレスポンスが与えられた場合
-      const malformedData = {
-        query: {
-          pages: {}
-        }
-      };
-
-      // 期待される結果: エラーが適切に処理される（undefinedまたはエラー）
-      expect(() => {
-        const firstPageId = Object.keys(malformedData.query.pages)[0];
-        const result = (malformedData.query.pages as any)[firstPageId]?.extract;
-        return result;
-      }).not.toThrow();
-    });
-
     it("should handle missing query in Wikipedia response", () => {
       // 条件: queryフィールドが存在しないレスポンスが与えられた場合
       const invalidData = {};
@@ -237,63 +171,10 @@ describe("chat.ts", () => {
       expect(() => {
         getSummaryFromJSON(null);
       }).toThrow();
-      
+
       expect(() => {
         getSummaryFromJSON(undefined);
       }).toThrow();
-    });
-
-    it("should handle empty message body for wiki command detection", () => {
-      // 条件: 空のメッセージ本文が与えられた場合
-      const emptyMessage = "";
-      const wikiOnly = "/wiki";
-      
-      // 期待される結果: startsWith関数が適切に動作する
-      expect(emptyMessage.startsWith("/wiki")).toBe(false);
-      expect(wikiOnly.startsWith("/wiki")).toBe(true);
-    });
-  });
-
-  describe("Additional coverage for wiki command logic", () => {
-    it("should correctly extract topics with special characters", () => {
-      // 条件: 特殊文字を含むwikiコマンドが与えられた場合
-      const wikiWithSpecialChars = "/wiki 人工知能_機械学習";
-      const topic = wikiWithSpecialChars.slice(wikiWithSpecialChars.indexOf(" ") + 1);
-      
-      // 期待される結果: 特殊文字を含むトピックが正しく抽出される
-      expect(topic).toBe("人工知能_機械学習");
-    });
-
-    it("should handle wiki command with leading/trailing spaces", () => {
-      // 条件: 前後にスペースがあるwikiコマンドが与えられた場合
-      const wikiWithSpaces = "/wiki  artificial intelligence  ";
-      const spaceIndex = wikiWithSpaces.indexOf(" ");
-      const topic = spaceIndex !== -1 ? wikiWithSpaces.slice(spaceIndex + 1) : "";
-      
-      // 期待される結果: スペースを含むトピックが抽出される
-      expect(topic).toBe(" artificial intelligence  ");
-    });
-
-    it("should test message ordering with different array sizes", () => {
-      // 条件: 異なるサイズの配列が与えられた場合
-      const singleMessage = [{ _id: "1", user: "Alice", body: "Only message" }];
-      const emptyMessages: any[] = [];
-      
-      // 期待される結果: reverse()が正しく動作する
-      expect([...singleMessage].reverse()).toHaveLength(1);
-      expect([...emptyMessages].reverse()).toHaveLength(0);
-    });
-
-    it("should validate Wikipedia URL construction with encoded characters", () => {
-      // 条件: エンコードが必要な文字を含むトピックが与えられた場合
-      const topicWithSpaces = "artificial intelligence";
-      const baseUrl = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=";
-      const fullUrl = baseUrl + topicWithSpaces;
-      
-      // 期待される結果: URLが正しく構築される
-      expect(fullUrl).toContain(topicWithSpaces);
-      expect(fullUrl).toContain("format=json");
-      expect(fullUrl).toContain("action=query");
     });
   });
 
@@ -302,7 +183,7 @@ describe("chat.ts", () => {
       // 条件: 有効なwikiコマンドが与えられた場合
       const command = "/wiki JavaScript";
       const topic = extractWikiTopic(command);
-      
+
       // 期待される結果: トピックが正しく抽出される
       expect(topic).toBe("JavaScript");
     });
@@ -311,7 +192,7 @@ describe("chat.ts", () => {
       // 条件: wikiコマンドでないメッセージが与えられた場合
       const message = "Hello world";
       const topic = extractWikiTopic(message);
-      
+
       // 期待される結果: nullが返される
       expect(topic).toBeNull();
     });
@@ -320,7 +201,7 @@ describe("chat.ts", () => {
       // 条件: トピックなしのwikiコマンドが与えられた場合
       const command = "/wiki";
       const topic = extractWikiTopic(command);
-      
+
       // 期待される結果: 空文字列が返される
       expect(topic).toBe("");
     });
@@ -329,7 +210,7 @@ describe("chat.ts", () => {
       // 条件: 複数の単語を含むwikiコマンドが与えられた場合
       const command = "/wiki artificial intelligence machine learning";
       const topic = extractWikiTopic(command);
-      
+
       // 期待される結果: 全ての単語が含まれる
       expect(topic).toBe("artificial intelligence machine learning");
     });
@@ -340,7 +221,7 @@ describe("chat.ts", () => {
       // 条件: トピックが与えられた場合
       const topic = "JavaScript";
       const url = buildWikipediaUrl(topic);
-      
+
       // 期待される結果: 正しいAPIのURLが生成される
       expect(url).toContain("https://en.wikipedia.org/w/api.php");
       expect(url).toContain("format=json");
@@ -353,7 +234,7 @@ describe("chat.ts", () => {
       // 条件: スペースを含むトピックが与えられた場合
       const topic = "artificial intelligence";
       const url = buildWikipediaUrl(topic);
-      
+
       // 期待される結果: URLエンコードが適切に行われる（URLSearchParamsは+を使用）
       expect(url).toContain("titles=artificial+intelligence");
     });
@@ -362,12 +243,184 @@ describe("chat.ts", () => {
       // 条件: 特殊文字を含むトピックが与えられた場合
       const topic = "C++";
       const url = buildWikipediaUrl(topic);
-      
+
       // 期待される結果: 特殊文字が適切にエンコードされる
       expect(url).toContain("titles=C%2B%2B");
     });
   });
 });
 
-// getSummaryFromJSON関数をテスト可能にするため、エクスポートする必要があります
-// 実際のchat.tsファイルでこの関数をexportする必要があります
+// Convex-test framework tests for DB operations
+describe("Database Operations with convex-test", () => {
+  it("should insert message into database using sendMessage mutation", async () => {
+    // convex-testフレームワークを使用してDBテストを実行
+    const t = convexTest();
+
+    // テストデータ
+    const testUser = "Alice";
+    const testBody = "Hello, world!";
+
+    // sendMessage mutationを実行
+    await t.mutation(api.chat.sendMessage, {
+      user: testUser,
+      body: testBody,
+    });
+
+    // データベースからメッセージを取得して検証
+    const messages = await t.query(api.chat.getMessages);
+
+    // 期待される結果: メッセージが正しく挿入されている
+    expect(messages).toHaveLength(1);
+    expect(messages[0].user).toBe(testUser);
+    expect(messages[0].body).toBe(testBody);
+  });
+
+  it("should retrieve messages in chronological order using getMessages query", async () => {
+    const t = convexTest();
+
+    // 複数のメッセージを挿入
+    await t.mutation(api.chat.sendMessage, {
+      user: "Alice",
+      body: "First message",
+    });
+
+    await t.mutation(api.chat.sendMessage, {
+      user: "Bob",
+      body: "Second message",
+    });
+
+    await t.mutation(api.chat.sendMessage, {
+      user: "Carol",
+      body: "Third message",
+    });
+
+    // メッセージを取得
+    const messages = await t.query(api.chat.getMessages);
+
+    // 期待される結果: メッセージが時系列順に並んでいる
+    expect(messages).toHaveLength(3);
+    expect(messages[0].body).toBe("First message");
+    expect(messages[1].body).toBe("Second message");
+    expect(messages[2].body).toBe("Third message");
+  });
+
+  it("should store regular message in database", async () => {
+    const t = convexTest();
+
+    // 通常のメッセージを送信（wikiコマンドではない）
+    await t.mutation(api.chat.sendMessage, {
+      user: "TestUser",
+      body: "This is a regular message",
+    });
+
+    // メッセージがデータベースに保存されていることを確認
+    const messages = await t.query(api.chat.getMessages);
+
+    expect(messages).toHaveLength(1);
+    expect(messages[0].user).toBe("TestUser");
+    expect(messages[0].body).toBe("This is a regular message");
+  });
+
+  it("should handle multiple messages with different content", async () => {
+    const t = convexTest();
+
+    // 様々な種類の通常メッセージを送信
+    await t.mutation(api.chat.sendMessage, {
+      user: "User1",
+      body: "Hello everyone!",
+    });
+
+    await t.mutation(api.chat.sendMessage, {
+      user: "User2",
+      body: "Good morning",
+    });
+
+    await t.mutation(api.chat.sendMessage, {
+      user: "User3",
+      body: "How is everyone doing?",
+    });
+
+    const messages = await t.query(api.chat.getMessages);
+
+    // 期待される結果: 全てのメッセージが正しく保存されている
+    expect(messages).toHaveLength(3);
+    expect(messages[0].body).toBe("Hello everyone!");
+    expect(messages[1].body).toBe("Good morning");
+    expect(messages[2].body).toBe("How is everyone doing?");
+  });
+
+  it("should handle special content types", async () => {
+    const t = convexTest();
+
+    // 空メッセージ
+    await t.mutation(api.chat.sendMessage, {
+      user: "User1",
+      body: "",
+    });
+
+    // 特殊文字を含むメッセージ
+    await t.mutation(api.chat.sendMessage, {
+      user: "ユーザー名",
+      body: "こんにちは！🌟",
+    });
+
+    const messages = await t.query(api.chat.getMessages);
+
+    expect(messages).toHaveLength(2);
+    expect(messages[0].body).toBe("");
+    expect(messages[1].user).toBe("ユーザー名");
+    expect(messages[1].body).toBe("こんにちは！🌟");
+  });
+
+  it("should handle query ordering and limit functionality", async () => {
+    const t = convexTest();
+
+    // 5個のメッセージを挿入（クエリ動作をテスト）
+    for (let i = 1; i <= 5; i++) {
+      await t.mutation(api.chat.sendMessage, {
+        user: `User${i}`,
+        body: `Message ${i}`,
+      });
+    }
+
+    const messages = await t.query(api.chat.getMessages);
+
+    // 期待される結果: 全てのメッセージが時系列順で返される
+    expect(messages).toHaveLength(5);
+    expect(messages[0].body).toBe("Message 1");
+    expect(messages[4].body).toBe("Message 5");
+    
+    // メッセージが正しい順序で返されることを確認
+    for (let i = 0; i < 5; i++) {
+      expect(messages[i].body).toBe(`Message ${i + 1}`);
+    }
+  });
+
+  it("should test Wikipedia URL construction and fetch logic", async () => {
+    // fetchをモック
+    global.fetch = vi.fn().mockResolvedValue({
+      json: vi.fn().mockResolvedValue({
+        query: {
+          pages: {
+            "12345": {
+              extract: "JavaScript is a programming language.",
+            },
+          },
+        },
+      }),
+    });
+
+    // Wikipedia API呼び出しをシミュレート
+    const topic = "JavaScript";
+    const expectedUrl =
+      "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=" +
+      topic;
+
+    const response = await fetch(expectedUrl);
+    const data = await response.json();
+    const summary = getSummaryFromJSON(data);
+
+    expect(fetch).toHaveBeenCalledWith(expectedUrl);
+    expect(summary).toBe("JavaScript is a programming language.");
+  });
+});
