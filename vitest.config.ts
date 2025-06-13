@@ -1,25 +1,31 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    // environment: "jsdom",
+    environmentMatchGlobs: [
+      ["src/**/**", "jsdom"],
+      ["convex/**/**", "edge-runtime"],
+    ],
+    server: { deps: { inline: ["convex-test"] } },
+    setupFiles: ["./src/test/setup.ts"],
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      provider: "v8",
+      reporter: ["text", "json", "html"],
       exclude: [
-        'node_modules/',
-        'src/test/',
-        '**/*.test.{ts,tsx}',
-        '**/*.config.{ts,js,mts}',
-        '**/*.d.{ts,js,mts}',
-        'convex/_generated/',
-        'vite.config.mts',
-      ]
-    }
+        "node_modules/",
+        "src/test/",
+        "dist/",
+        "**/*.test.{ts,tsx}",
+        "**/*.config.{ts,js,mts}",
+        "**/*.d.{ts,js,mts}",
+        "convex/_generated/",
+        "vite.config.mts",
+      ],
+    },
   },
-})
+});
